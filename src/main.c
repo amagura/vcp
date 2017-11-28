@@ -23,6 +23,16 @@ limitations under the License.
 #include <errno.h>
 #include <libgen.h>
 #include <git2.h>
+#include <dirent.h>
+#include <commoner.h>
+
+#ifndef catm
+# define catm(...) (concatm(__VA_ARGS__, (void *)NULL))
+#endif
+
+#ifndef catl
+# define catl(...) (concatl(__VA_ARGS__, (void *)NULL))
+#endif
 
 #ifndef PATH_MAX
 # ifdef LINUX_LIMITS_H
@@ -37,7 +47,6 @@ enum repo_type {
      RT_HG = 2,
 };
 
-
 int abspath(char *path)
 {
      char buf[PATH_MAX + 1];
@@ -46,11 +55,26 @@ int abspath(char *path)
      return -1;
 }
 
-enum repo_type inrepo(char *path)
+enum repo_type inrepo(void)
 {
-     /* check if we're in a git repo */
-     if (git_repository_open_ext(NULL, path, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL) == 0)
-          return RT_GIT;
+     char cwd[PATH_MAX + 1];
+     if (getcwd(cwd, sizeof(cwd)) == NULL)
+          return -9;
+
+     catm(cwd, (PATH_MAX + 1), "/.git", (void *)NULL);
+
+     DIR *dir = opendir(cwd);
+     if (dir) {
+          closedir(dir);
+top_level_git:
+          /* check if we're in a git repo */
+          if (git_repository_open_ext(NULL, cwd, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL) == 0)
+               return RT_GIT;
+     } else if (ENOENT == errno) {
+          git_buf root = {0};
+          int error = git_repository_discover(&root, cwd, 0, NULL);
+          
+
      return RT_NON;
 }
 
@@ -64,6 +88,8 @@ int main(int argc, char **argv)
 
      if (argc < 1)
           goto fail;
+
+     int r = -9;
      /* FIXME: try to find a way to delay starting
       * the git library until we know we are
       * in a git repo, so that we don't have to
@@ -71,9 +97,20 @@ int main(int argc, char **argv)
      git_libgit2_init();
 
      char cwd[PATH_MAX+1];
-     if (getcwd(cwd, sizeof(cwd)) != NULL)
+     if (getcwd(cwd, sizeof(cwd)) != NULL) {
           // print debug info
-          inrepo(cwd);
+          r = inrepo(cwd);
+          fprintf(stderr, "result from inrepo: '%d'\n", r);
+          switch (r) {
+               case RT_NON:
+                    fprintf(stderr, "error\n");
+                    goto fail;
+                    break;
+               case RT_GIT:
+                    fprintf(stderr, "git repo\n");
+                    break;
+          }
+     }
      return EXIT_SUCCESS;
 fail:
      return EXIT_FAILURE;
