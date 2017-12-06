@@ -18,6 +18,7 @@ AC_CANONICAL_TARGET
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
 
 # Checks for libraries.
 AC_SEARCH_LIBS([concatm], [commoner],, AC_MSG_ERROR([libcommoner is required]))
@@ -30,7 +31,7 @@ AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-AC_CHECK_FUNCS([getcwd realpath])
+AC_CHECK_FUNCS([getcwd])
 
 ###############################
 # Automake directives

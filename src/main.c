@@ -47,13 +47,13 @@ enum repo_type {
      RT_HG = 2,
 };
 
-int abspath(char *path)
-{
-     char buf[PATH_MAX + 1];
-     char *ptr = realpath(*path, buf);
-     /* FIXME: check errno!! */
-     return -1;
-}
+/*int abspath(char *path)*/
+/*{*/
+     /*char buf[PATH_MAX + 1];*/
+     /*char *ptr = realpath(*path, buf);*/
+     /*[> FIXME: check errno!! <]*/
+     /*return -1;*/
+/*}*/
 
 enum repo_type inrepo(void)
 {
@@ -73,7 +73,7 @@ top_level_git:
      } else if (ENOENT == errno) {
           git_buf root = {0};
           int error = git_repository_discover(&root, cwd, 0, NULL);
-          
+
 
      return RT_NON;
 }
