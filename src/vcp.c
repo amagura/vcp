@@ -40,6 +40,8 @@ limitations under the License.
 # endif
 #endif
 
+extern int gitrepo(char *cwd);
+
 enum repo_type {
      RT_NON = -1,
      RT_GIT = 0,
@@ -61,19 +63,7 @@ enum repo_type inrepo(void)
      if (getcwd(cwd, sizeof(cwd)) == NULL)
           return -9;
 
-     catm(cwd, (PATH_MAX + 1), "/.git", (void *)NULL);
-
-     DIR *dir = opendir(cwd);
-     if (dir) {
-          closedir(dir);
-top_level_git:
-          /* check if we're in a git repo */
-          if (git_repository_open_ext(NULL, cwd, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL) == 0)
-               return RT_GIT;
-     } else if (ENOENT == errno) {
-          git_buf root = {0};
-          int error = git_repository_discover(&root, cwd, 0, NULL);
-
+     gitrepo(cwd);
 
      return RT_NON;
 }
@@ -97,19 +87,16 @@ int main(int argc, char **argv)
      git_libgit2_init();
 
      char cwd[PATH_MAX+1];
-     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-          // print debug info
-          r = inrepo(cwd);
-          fprintf(stderr, "result from inrepo: '%d'\n", r);
-          switch (r) {
-               case RT_NON:
-                    fprintf(stderr, "error\n");
-                    goto fail;
-                    break;
-               case RT_GIT:
-                    fprintf(stderr, "git repo\n");
-                    break;
-          }
+     r = inrepo();
+     fprintf(stderr, "result from inrepo: '%d'\n", r);
+     switch (r) {
+          case RT_NON:
+               fprintf(stderr, "error\n");
+               goto fail;
+               break;
+          case RT_GIT:
+               fprintf(stderr, "git repo\n");
+               break;
      }
      return EXIT_SUCCESS;
 fail:

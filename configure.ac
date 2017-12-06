@@ -27,11 +27,12 @@ AC_SEARCH_LIBS([git_libgit2_init], [git2],, AC_MSG_ERROR([libgit2 is required fo
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
+AC_CHECK_HEADER_STDBOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-AC_CHECK_FUNCS([getcwd])
+AC_CHECK_FUNCS([getcwd strdup])
 
 ###############################
 # Automake directives
