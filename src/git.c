@@ -26,17 +26,46 @@ limitations under the License.
 #include <git2.h>
 #include <dirent.h>
 
+/* macros to decrease typing and line length */
+#define repo_open_ext git_repository_open_ext
+#define repo_discover git_repository_discover
+
 int gitrepo(char *cwd)
 {
-     int ret;
-     char *tmp = strdup(cwd);
-     catm(tmp, (PATH_MAX + 1), tmp, "/.git");
-     git_libgit2_init();
-     if (direxists(".git")) {
-          ret = git_repository_open_ext(NULL, cwd, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
-     } else {
-          git_buf root {0};
-          int err = git_repository_discover(&root, cwd, 0, NULL);
+     int ret, err;
+     char *path = NULL;
+     COM_DBG("cwd: '%s'\n", cwd);
+
+     /* find the first case of '.git' in cwd */
+     if (strstr(cwd, "/.git") == NULL) {
+          char *dirs[2] = { cwd, "/.git" };
+          path = subdir(dirs, PATH_MAX + 1);
+          if (path == NULL) {
+               free(path);
+               goto rfail;
+          }
      }
+     COM_DBG("cwd: '%s', path: '%s'\n", cwd, path);
+     git_libgit2_init();
+     ret = repo_open_ext(NULL, path, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
+     COM_DBG("ret: '%d', GIT_ENOTFOUND: '%d'\n", ret, GIT_ENOTFOUND);
+     if (ret == 0)
+          goto rok_free;
+     exit(0);
+     git_buf root;
+     memset(&root, 0, sizeof(root));
+     err = repo_discover(&root, cwd, 0, NULL);
+     COM_DBG("root.asize: '%lu'\n", root.asize);
+     if (root.asize != 0) {
+          COM_DBG("(root dir of git repo) root.ptr: '%s'\n", root.ptr);
+          com_neko("%s\n", "calling gitrepo recursively");
+          gitrepo(root.ptr);
+     }
+rfail:
+     return false;
+rok_free:
+     free(path);
      return true;
 }
+#undef repo_open_ext
+#undef repo_discover

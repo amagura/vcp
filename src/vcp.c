@@ -15,6 +15,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****/
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -26,21 +30,13 @@ limitations under the License.
 #include <dirent.h>
 #include <commoner.h>
 
-#ifndef catm
-# define catm(...) (concatm(__VA_ARGS__, (void *)NULL))
-#endif
-
-#ifndef catl
-# define catl(...) (concatl(__VA_ARGS__, (void *)NULL))
-#endif
+#include "git.h"
 
 #ifndef PATH_MAX
 # ifdef LINUX_LIMITS_H
 #  include <linux/limits.h>
 # endif
 #endif
-
-extern int gitrepo(char *cwd);
 
 enum repo_type {
      RT_NON = -1,
@@ -59,11 +55,16 @@ enum repo_type {
 
 enum repo_type inrepo(void)
 {
+     int ret;
      char cwd[PATH_MAX + 1];
      if (getcwd(cwd, sizeof(cwd)) == NULL)
           return -9;
 
-     gitrepo(cwd);
+     ret = gitrepo(cwd);
+     if (ret != true)
+          git_libgit2_shutdown();
+     else
+          return RT_GIT;
 
      return RT_NON;
 }
@@ -84,9 +85,7 @@ int main(int argc, char **argv)
       * the git library until we know we are
       * in a git repo, so that we don't have to
       * do unnecessary cleanup */
-     git_libgit2_init();
 
-     char cwd[PATH_MAX+1];
      r = inrepo();
      fprintf(stderr, "result from inrepo: '%d'\n", r);
      switch (r) {
