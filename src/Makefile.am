@@ -11,30 +11,30 @@ AM_CFLAGS += -O2 -Wall -Wextra
 # I probably don't need to define HAVE_CONFIG_H, but I'm not sure what else to do.
 AM_CPPFLAGS += -DHAVE_CONFIG_H=1 -I$(top_srcdir)
 
-if DEBUG
-AM_CFLAGS += -g -ggdb
-AM_CPPFLAGS += -DCOM_DEBUG=1
-endif
+#if DEBUG
+#AM_CFLAGS += -g -ggdb
+#AM_CPPFLAGS += -DCOM_DEBUG=1
+#endif
 
-if !DEBUG
-if NO_DEBUG
-AM_CPPFLAGS += -DCOM_DEBUG=0
-endif
-endif
+#if !DEBUG
+#if NO_DEBUG
+#AM_CPPFLAGS += -DCOM_DEBUG=0
+#endif
+#endif
 
-if NATIVE
-if !GENERIC
-AM_CFLAGS += -march=native -mtune=native
-endif
-endif
+#if NATIVE
+#if !GENERIC
+#AM_CFLAGS += -march=native -mtune=native
+#endif
+#endif
 
-if GENERIC
-if CPU_KNOWN
-AM_CFLAGS += -mtune=generic-$(CPUTYPE)
-else
-AM_CFLAGS += -mtune=generic
-endif
-endif
+#if GENERIC
+#if CPU_KNOWN
+#AM_CFLAGS += -mtune=generic-$(CPUTYPE)
+#else
+#AM_CFLAGS += -mtune=generic
+#endif
+#endif
 
 vcp_CFLAGS = $(AM_CFLAGS)
 vcp_CPPFLAGS = -DCOM_PROGNAME=\"vcp\" $(AM_CPPFLAGS)
