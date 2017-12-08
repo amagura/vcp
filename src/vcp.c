@@ -62,6 +62,7 @@ enum repo_type inrepo(void)
           return -9;
 
      ret = gitrepo(cwd);
+     COMNR_DBG("gitrepo return code: '%d'\n", ret);
      if (ret != true)
           git_libgit2_shutdown();
      else

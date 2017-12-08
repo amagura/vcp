@@ -65,8 +65,7 @@ BEGIN_C_DECLS
 # include <config.h>
 #endif
 
-
-int gitrepo PARAMS((char *cwd));
+int gitrepo PARAMS((Ustr *cwd));
 
 END_C_DECLS
 

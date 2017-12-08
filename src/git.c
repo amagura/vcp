@@ -25,14 +25,18 @@ limitations under the License.
 
 #include <string.h>
 #include <stdbool.h>
-# include <git2.h>
+#include <git2.h>
 #include <dirent.h>
+#include <ustr.h>
 
 /* macros to decrease typing and line length */
 #define repo_open_ext git_repository_open_ext
 #define repo_discover git_repository_discover
 
-int gitrepo(char *cwd)
+/* If we're in a git repo, returns true and cwd is set to the root .git dir
+ * else returns false and *cwd is left untouched.
+ */
+int gitrepo(Ustr *cwd)
 {
      int ret, err;
      char *path = NULL;
@@ -57,15 +61,18 @@ int gitrepo(char *cwd)
 
      COMNR_DBG("cwd: '%s', path: '%s'\n", cwd, path);
      COMNR_DBG("cwd + path: '%s/%s'\n", cwd, path);
+     /* XXX repo_open_ext returns 0 when the git repo has been found */
      ret = repo_open_ext(NULL, path, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
      COMNR_DBG("ret: '%d', GIT_ENOTFOUND: '%d'\n", ret, GIT_ENOTFOUND);
      if (ret == 0)
           goto rok_free;
+     /* maybe we're in a subdir of the repository.  Let's check */
      git_buf root;
      memset(&root, 0, sizeof(root));
      err = repo_discover(&root, path, 0, NULL);
      COMNR_DBG("root.asize: '%lu'\n", root.asize);
-     if (root.asize != 0) {
+     /* root.asize is how much memory has been consumed by the path to the repo root */
+     if (root.asize > 0) {
           COMNR_DBG("(root dir of git repo) root.ptr: '%s'\n", root.ptr);
 
           comnr_ping;

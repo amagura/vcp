@@ -19,6 +19,8 @@ AC_CANONICAL_TARGET
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
+PKG_PROG_PKG_CONFIG()
+PKG_CHECK_MODULES([USTR], [ustr],, AC_MSG_ERROR([Ustr is a dependency for vcp]))
 
 # Checks for libraries.
 AC_SEARCH_LIBS([concatm], [commoner],, AC_MSG_ERROR([libcommoner is required]))
