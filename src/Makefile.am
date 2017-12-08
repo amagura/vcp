@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = vcp
-vcp_SOURCES = vcp.c git.c svn.c hg.c
+vcp_SOURCES = vcp.c git.c svn.c hg.c git.h
 
 AM_CFLAGS =
 AM_LDFLAGS =
@@ -125,5 +125,5 @@ check-all: $(bin_PROGRAMS) gzbatt refresh-check
 debug:
 	cd "$(top_srcdir)"; \
 	autoconf && \
-	./configure --enable-debug --enable-testdir --enable-generic --disable-native && \
+	./configure --enable-debug && \
 	$(MAKE)

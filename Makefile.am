@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_doc_DATA = LICENSE NOTICE INSTALL
+#dist_doc_DATA = LICENSE NOTICE INSTALL
 
-dist_pkgdata_DATA = example.conf
+#dist_pkgdata_DATA = example.conf
 
 SUBDIRS = src
 

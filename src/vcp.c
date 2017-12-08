@@ -26,8 +26,9 @@ limitations under the License.
 #include <limits.h>
 #include <errno.h>
 #include <libgen.h>
-#include <git2.h>
+# include <git2.h>
 #include <dirent.h>
+#define COMNR_EXTERNAL_DEBUG 1
 #include <commoner.h>
 
 #include "git.h"

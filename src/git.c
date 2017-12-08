@@ -20,10 +20,12 @@ limitations under the License.
 # include <config.h>
 #endif
 
+#include "git.h"
+#include <commoner.h>
+
 #include <string.h>
 #include <stdbool.h>
-#include <commoner.h>
-#include <git2.h>
+# include <git2.h>
 #include <dirent.h>
 
 /* macros to decrease typing and line length */
@@ -34,7 +36,7 @@ int gitrepo(char *cwd)
 {
      int ret, err;
      char *path = NULL;
-     COM_DBG("cwd: '%s'\n", cwd);
+     COMNR_DBG("cwd: '%s'\n", cwd);
 
      /* find the first case of '.git' in cwd */
      if (strstr(cwd, "/.git") == NULL) {
@@ -45,20 +47,23 @@ int gitrepo(char *cwd)
                goto rfail;
           }
      }
-     COM_DBG("cwd: '%s', path: '%s'\n", cwd, path);
+     COMNR_DBG("cwd: '%s', path: '%s'\n", cwd, path);
      git_libgit2_init();
      ret = repo_open_ext(NULL, path, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
-     COM_DBG("ret: '%d', GIT_ENOTFOUND: '%d'\n", ret, GIT_ENOTFOUND);
+     COMNR_DBG("ret: '%d', GIT_ENOTFOUND: '%d'\n", ret, GIT_ENOTFOUND);
      if (ret == 0)
           goto rok_free;
-     exit(0);
      git_buf root;
      memset(&root, 0, sizeof(root));
      err = repo_discover(&root, cwd, 0, NULL);
-     COM_DBG("root.asize: '%lu'\n", root.asize);
+     COMNR_DBG("root.asize: '%lu'\n", root.asize);
      if (root.asize != 0) {
-          COM_DBG("(root dir of git repo) root.ptr: '%s'\n", root.ptr);
-          com_neko("%s\n", "calling gitrepo recursively");
+          COMNR_DBG("(root dir of git repo) root.ptr: '%s'\n", root.ptr);
+
+          comnr_ping;
+
+          comnr_neko("%s\n", "calling gitrepo recursively");
+
           gitrepo(root.ptr);
      }
 rfail:

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Vcp], [0.0.1], [amagura28@gmail.com], [https://github.com/amagura/vcp/issues])
+AC_INIT([Vcp], [0.0.1], [amagura28@gmail.com],, [https://github.com/amagura/vcp/issues])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_FILES([Makefile
@@ -25,7 +25,7 @@ AC_SEARCH_LIBS([concatm], [commoner],, AC_MSG_ERROR([libcommoner is required]))
 AC_SEARCH_LIBS([git_libgit2_init], [git2],, AC_MSG_ERROR([libgit2 is required for git support]))
 
 # Checks for header files.
-AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
+AC_CHECK_HEADERS([limits.h stdlib.h unistd.h git.h git2.h])
 AC_CHECK_HEADER_STDBOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
