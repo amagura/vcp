@@ -42,20 +42,28 @@ int gitrepo(char *cwd)
      if (strstr(cwd, "/.git") == NULL) {
           char *dirs[2] = { cwd, "/.git" };
           path = subdir(dirs, PATH_MAX + 1);
-          if (path == NULL) {
+          if (path == NULL) { /* allocation in subdir failed */
                free(path);
                goto rfail;
           }
+
+	  /* check if .git exists in the current directory */
+	  if ((ret = direxists(path)) != true && ret == false)
+	       path = cwd;
+
+     } else {
+	  path = cwd;
      }
+
      COMNR_DBG("cwd: '%s', path: '%s'\n", cwd, path);
-     git_libgit2_init();
+     COMNR_DBG("cwd + path: '%s/%s'\n", cwd, path);
      ret = repo_open_ext(NULL, path, GIT_REPOSITORY_OPEN_NO_SEARCH, NULL);
      COMNR_DBG("ret: '%d', GIT_ENOTFOUND: '%d'\n", ret, GIT_ENOTFOUND);
      if (ret == 0)
           goto rok_free;
      git_buf root;
      memset(&root, 0, sizeof(root));
-     err = repo_discover(&root, cwd, 0, NULL);
+     err = repo_discover(&root, path, 0, NULL);
      COMNR_DBG("root.asize: '%lu'\n", root.asize);
      if (root.asize != 0) {
           COMNR_DBG("(root dir of git repo) root.ptr: '%s'\n", root.ptr);

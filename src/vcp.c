@@ -86,7 +86,7 @@ int main(int argc, char **argv)
       * the git library until we know we are
       * in a git repo, so that we don't have to
       * do unnecessary cleanup */
-
+     git_libgit2_init();
      r = inrepo();
      fprintf(stderr, "result from inrepo: '%d'\n", r);
      switch (r) {
