@@ -87,5 +87,8 @@ rok_free:
      free(path);
      return true;
 }
+
+gitcommit 
+
 #undef repo_open_ext
 #undef repo_discover
